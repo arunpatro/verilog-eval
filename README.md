@@ -9,6 +9,11 @@ instructional website [HDLBits](https://hdlbits.01xz.net/wiki/Problem_sets).
 We provide two sets of problem descriptions: machine generated and manually
 converted to text-only format.
 
+## Differences from NVLabs/verilog-eval
+Functions in functions doesn't seem to be able to pickled. So we need to create the functions outside. 
+[TODO] Add traceback error from the other repo.
+
+
 ## Installation
 
 We closely follow guidance from [HumanEval](https://github.com/openai/human-eval/tree/master).

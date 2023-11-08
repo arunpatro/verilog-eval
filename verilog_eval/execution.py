@@ -20,17 +20,8 @@ def clean_up_simulation() -> None:
     print("Killing all hanging simulation process.")
     subprocess.run("pkill iverilog", shell=True)
     subprocess.run("pkill vvp", shell=True)
-
-def check_correctness(problem: Dict, completion: str, timeout: float,
-                      completion_id: Optional[int] = None, unit_test_length: Optional[int] = None) -> Dict:
-    """
-    Evaluates the functional correctness of a completion by running the test
-    suite provided in the problem. 
-    :param completion_id: an optional completion ID so we can match
-        the results later even if execution finishes asynchronously.
-    """
-
-    def unsafe_execute():
+    
+def unsafe_execute(problem: Dict, completion: str, result: any, timeout: float, unit_test_length: Optional[int] = None):
 
         with create_tempdir():
 
@@ -76,7 +67,7 @@ def check_correctness(problem: Dict, completion: str, timeout: float,
 # Once you have read this disclaimer and taken appropriate precautions, 
 # proceed at your own risk:
 # BEGIN CODE BLOCK
-"""
+# """
                 with swallow_io():
                     with time_limit(timeout):
                         cmd = "iverilog -Wall -Winfloop -Wno-timescale -g2012 \
@@ -109,7 +100,7 @@ def check_correctness(problem: Dict, completion: str, timeout: float,
                                 result.append(f"failed: {cor} out of {tot} samples.")
                         else:
                             result.append("failed: info string not matched.")
-"""
+# """
 # END CODE BLOCK
             except TimeoutException:
                 result.append("timed out")
@@ -121,10 +112,31 @@ def check_correctness(problem: Dict, completion: str, timeout: float,
             os.rmdir = rmdir
             os.chdir = chdir
             
+
+def check_correctness(problem: Dict, completion: str, timeout: float,
+                      completion_id: Optional[int] = None, unit_test_length: Optional[int] = None) -> Dict:
+    """
+    Evaluates the functional correctness of a completion by running the test
+    suite provided in the problem. 
+    :param completion_id: an optional completion ID so we can match
+        the results later even if execution finishes asynchronously.
+    """
+
+    
     manager = multiprocessing.Manager()
     result = manager.list()
 
-    p = multiprocessing.Process(target=unsafe_execute)
+    p = multiprocessing.Process(
+        target=unsafe_execute,
+        args=(
+            problem, 
+            completion, 
+            result, 
+            timeout,
+            unit_test_length
+        ),
+    )
+    
     p.start()
     p.join(timeout=timeout + 1)
     if p.is_alive():
