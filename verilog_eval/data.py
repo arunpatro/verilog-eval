@@ -5,6 +5,10 @@ import os
 
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+VERILOG_EVAL_HUMAN = os.path.join(ROOT, "..", "data", "VerilogEval_Human.jsonl")
+VERILOG_EVAL_MACHINE = os.path.join(ROOT, "..", "data", "VerilogEval_Machine.jsonl")
+HUMAN_DESCRIPTIONS = os.path.join(ROOT, "..", "descriptions", "VerilogDescription_Human.jsonl")
+MACHINE_DESCRIPTIONS = os.path.join(ROOT, "..", "descriptions", "VerilogDescription_Machine.jsonl")
 
 def read_problems(evalset_file: str) -> Dict[str, Dict]:
     return {task["task_id"]: task for task in stream_jsonl(evalset_file)}
